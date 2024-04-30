@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+    
+    environment {
+        JAVA_HOME = '/usr/local/opt/openjdk@11'
+        PATH = "$JAVA_HOME/bin:$PATH"
+    }
+    
+    tools {
+        // Use the Maven installation configured in Jenkins
+        maven 'maven'
+    }
+    
+    stages {
+        stage('Checkout Github Repository') {
+            steps {
+                // Checkout the code from GitHub
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/pavithrahareddy/JenkinsProjects']]])
+            }
+        }
+        
+        stage('Install Python Dependencies') {
+            steps {
+                // Install Python dependencies using pip
+                script {
+                    sh 'pip3 install -r requirements.txt'
+                }
+            }
+        }
+        
+        stage('Run Python Tests') {
+            steps {
+                // Run your Python tests
+                 dir('python_math') {
+                    sh 'python3 -m pytest -v --junit-xml test-results.xml'
+                }
+            }
+        }
+        
+        stage('Publish Python Test Results') {
+            steps {
+                // Publish Python test results (JUnit format)
+                script {
+                    junit 'test-results.xml'
+                }
+            }
+        }
+        
+        
+        stage('Run Java Tests') {
+            steps {
+                // Run JUnit tests and generate XML test report
+                dir('java_math'){
+                sh 'mvn test'
+                }
+            }
+        }
+        
+        stage('Publish Java Test Results') {
+            steps {
+                // Publish Python test results (JUnit format)
+                script {
+                     junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+    }
+
+}
