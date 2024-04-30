@@ -14,6 +14,3 @@ def test_multiply():
 def test_divide():
     assert MathUtils.divide(6, 3) == 2.0
     assert MathUtils.divide(5, 0) == -1.0
-
-
-
