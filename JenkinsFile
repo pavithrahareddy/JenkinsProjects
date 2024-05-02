@@ -58,7 +58,7 @@ pipeline {
         
         stage('Publish Java Test Results') {
             steps {
-                // Publish Python test results (JUnit format)
+                // Publish Python test results
                 script {
                      junit '**/target/surefire-reports/*.xml'
                 }
